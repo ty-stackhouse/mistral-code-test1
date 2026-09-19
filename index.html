@@ -1,19 +1,393 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello, World</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drive Defensively — Study Guide</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --panel2:#273449; --text:#e2e8f0; --muted:#94a3b8;
+  --accent:#38bdf8; --good:#34d399; --warn:#fbbf24; --bad:#f87171; --line:#334155;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{background:var(--bg); color:var(--text); font:16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif}
+#app{max-width:920px; margin:0 auto; padding:24px 16px 80px}
+header{margin-bottom:24px}
+h1{font-size:1.7rem; letter-spacing:.5px}
+h1 span{color:var(--accent)}
+.tagline{color:var(--muted); margin-top:6px; font-size:.95rem}
+nav{display:flex; flex-wrap:wrap; gap:8px; margin:20px 0}
+nav button{
+  background:var(--panel); color:var(--text); border:1px solid var(--line);
+  border-radius:8px; padding:8px 14px; cursor:pointer; font-size:.9rem;
+}
+nav button.active{background:var(--accent); color:#0f172a; border-color:var(--accent); font-weight:600}
+nav button:hover{border-color:var(--accent)}
+.progress{height:8px; background:var(--panel); border-radius:99px; overflow:hidden; margin-bottom:24px}
+.progress div{height:100%; background:var(--good); transition:width .4s ease}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:16px}
+.card h2{font-size:1.15rem; margin-bottom:10px; color:var(--accent)}
+.card p{margin-bottom:10px}
+.card ul{margin:8px 0 8px 20px}
+.card li{margin-bottom:6px}
+.checklist li{list-style:none; margin-left:0}
+label.chk{display:flex; gap:10px; align-items:flex-start; cursor:pointer; padding:6px 0}
+label.chk input{margin-top:4px; accent-color:var(--good)}
+li.done span{text-decoration:line-through; color:var(--muted)}
+.k{color:var(--warn); font-weight:600}
+.badge{display:inline-block; font-size:.75rem; padding:2px 10px; border-radius:99px; border:1px solid var(--line); color:var(--muted); margin-left:8px; vertical-align:middle}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px}
+.stat{background:var(--panel2); border-radius:10px; padding:14px}
+.stat b{font-size:1.5rem; color:var(--good)}
+.stat small{color:var(--muted); display:block; margin-top:4px}
+.see{display:grid; gap:12px; margin-top:12px}
+.see .step{background:var(--panel2); border-left:4px solid var(--accent); border-radius:8px; padding:14px}
+.see .step b{color:var(--accent); text-transform:uppercase; letter-spacing:1px; font-size:.8rem; display:block; margin-bottom:4px}
+.q{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:14px}
+.q h3{font-size:1rem; margin-bottom:12px}
+.opts{display:grid; gap:8px}
+.opt{display:flex; gap:10px; align-items:flex-start; background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:10px 12px; cursor:pointer; text-align:left; width:100%; color:var(--text); font-size:.95rem}
+.opt:hover{border-color:var(--accent)}
+.opt.correct{border-color:var(--good); background:rgba(52,211,153,.12)}
+.opt.wrong{border-color:var(--bad); background:rgba(248,113,113,.12)}
+.opt:disabled{cursor:default}
+.feedback{margin-top:10px; padding:10px 12px; border-radius:8px; font-size:.9rem}
+.feedback.ok{background:rgba(52,211,153,.12); color:var(--good)}
+.feedback.no{background:rgba(248,113,113,.12); color:var(--bad)}
+footer{margin-top:40px; color:var(--muted); font-size:.8rem; border-top:1px solid var(--line); padding-top:16px}
+a{color:var(--accent)}
+</style>
 </head>
 <body>
-  <div id="app">{{ message }}
-    <button @click="count++">clicked {{ count }} times</button>
-  </div>
-  <script>
-    Vue.createApp({
-      data: () => ({ message: "Hello, World!", count: 0 })
-    }).mount("#app");
-  </script>
+<div id="app">
+  <header>
+    <h1>Drive <span>Defensively</span></h1>
+    <p class="tagline">Being a good driver, not passing a test. Built from the NTDETAS May 2023 standards (ADTSEA Attachment A &amp; DSAA Attachment B curriculum standards).</p>
+  </header>
+
+  <div class="progress"><div :style="{width: overallPct + '%'}"></div></div>
+
+  <nav>
+    <button v-for="t in tabs" :key="t.id" :class="{active: tab===t.id}" @click="tab=t.id">{{ t.name }}</button>
+  </nav>
+
+  <!-- HOME -->
+  <template v-if="tab==='home'">
+    <div class="card">
+      <h2>The one habit that prevents crashes</h2>
+      <p>Crashes are rarely caused by not knowing the law. They're caused by late detection of risk: failing to <span class="k">search</span> the road ahead, misjudging <span class="k">speed and space</span>, and driving while impaired, distracted, or emotional. Defensive driving means managing risk continuously — before it becomes an emergency.</p>
+    </div>
+    <div class="grid">
+      <div class="stat"><b>94%</b><small>of serious crashes involve driver error, not the vehicle or road (NHTSA)</small></div>
+      <div class="stat"><b>3–4s</b><small>minimum following distance — 3s lets you steer out of trouble, 4s lets you brake out of it up to 65 mph</small></div>
+      <div class="stat"><b>6–9s</b><small>search ahead of your vehicle to see risk before it reaches you</small></div>
+      <div class="stat"><b>2s</b><small>is all it takes to miss a hazard if you glance at your phone at 55 mph</small></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>Your study path</h2>
+      <ul>
+        <li><b>SEE System</b> — the search/evaluate/execute loop that drives everything else</li>
+        <li><b>Space Management</b> — following distance, lane position, escape paths</li>
+        <li><b>Driver Fitness</b> — impairment, distraction, fatigue, emotions</li>
+        <li><b>Emergencies &amp; Conditions</b> — traction loss, adverse weather, vehicle failures</li>
+        <li><b>Practice Checklists</b> — turn concepts into habits</li>
+        <li><b>Quiz</b> — test yourself</li>
+      </ul>
+    </div>
+  </template>
+
+  <!-- SEE -->
+  <template v-else-if="tab==='see'">
+    <div class="card">
+      <h2>SEE: Search — Evaluate — Execute</h2>
+      <p>The space management system used in the ADTSEA curriculum standards (Attachment A, IC 3.0 / Segment II). You run this loop continuously — every few seconds — for your entire drive.</p>
+      <div class="see">
+        <div class="step">
+          <b>1. Search</b>
+          Scan for changes to your <span class="k">path of travel</span> (where you're going) and <span class="k">line of sight</span> (what you can see). Look 12–15 seconds ahead, check mirrors every 5–8 seconds, clear intersections before entering. You're hunting for anything that could close your path or hide a hazard.
+        </div>
+        <div class="step">
+          <b>2. Evaluate</b>
+          Identify high-risk situations: Is that car drifting? Will that pedestrian step out? Does this hill or curve hide what's beyond it? Decide <em>now</em> what you'd do if it goes wrong — your options, escape paths, and the consequences of each.
+        </div>
+        <div class="step">
+          <b>3. Execute</b>
+          Make the low-risk move early: adjust speed, adjust position, communicate (signals, lights, horn, lane position, eye contact). Small, early adjustments beat big, late reactions every time.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Where to look — the visual search pattern</h2>
+      <ul>
+        <li><b>Aim high:</b> target the farthest point of your intended path; the car follows your eyes.</li>
+        <li><b>12–15s ahead</b> in city driving (~1 block), <b>20–30s ahead</b> on highways (~⅓ mile).</li>
+        <li><b>Sweep:</b> far target → middle distance → near road → mirrors → gauges, and repeat.</li>
+        <li><b>Check the rear zone</b> before any speed or position change — know what's behind you before you need it.</li>
+        <li><b>Intersections:</b> even with a green light, look left-center-right and into crosswalks before entering.</li>
+      </ul>
+    </div>
+  </template>
+
+  <!-- SPACE -->
+  <template v-else-if="tab==='space'">
+    <div class="card">
+      <h2>Following distance: the 3/4-second rule</h2>
+      <p>Pick a fixed object (a sign, a shadow line). When the rear of the vehicle ahead passes it, count <em>"one thousand-one, one thousand-two"…</em> until your front bumper reaches the same object.</p>
+      <ul>
+        <li><b>3 seconds</b> — lets you <span class="k">steer</span> out of problems at any speed, and brake out of problems up to ~45 mph.</li>
+        <li><b>4 seconds</b> — lets you <span class="k">brake</span> out of problems up to ~65 mph.</li>
+        <li>Add more for: rain, night, towing, a tailgater behind you, a heavy truck ahead, or when you're tired.</li>
+        <li>If someone tailgates you: <em>increase</em> your following distance (your 4th second belongs to them) and, when safe, move right and let them pass. Don't brake-check.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Manage all six zones</h2>
+      <p>Your vehicle has six zones of space: front, rear, left, right, above, and below. The front zone is the biggest threat — you drive into it at speed. Never let two zones close at once.</p>
+      <ul>
+        <li><b>Lane position:</b> drive in the lane position that maximizes your escape route — usually LC 2 (center) or LP 3 away from parked cars and oncoming traffic.</li>
+        <li><b>Escape path:</b> always know where you'd steer if your path closed <em>right now</em>. If you have no escape, slow down until you have one.</li>
+        <li><b>Stale green:</b> a light that's been green a while? Cover the horn, ease off, expect the change.</li>
+        <li><b>No-zones:</b> stay out of truck and bus blind spots — if you can't see the driver's mirrors, the driver can't see you.</li>
+        <li><b>Parking lots &amp; residential:</b> cover pedestrians, driveways, and any car that could move.</li>
+      </ul>
+    </div>
+  </template>
+
+  <!-- FITNESS -->
+  <template v-else-if="tab==='fitness'">
+    <div class="card">
+      <h2>Distraction: a vision problem first</h2>
+      <p>The standards (Attachment A, C.II.2.3) frame distraction as a <span class="k">vision and mental problem</span>: your focal vision leaves the travel path, and your brain can't process the road while it's elsewhere.</p>
+      <ul>
+        <li>Inside distractions: phone, passengers, eating, climate controls, grooming.</li>
+        <li>Outside distractions: billboards, crashes, scenery, activity on sidewalks.</li>
+        <li>Personal distractions: emotions, deadlines, conversations in your head.</li>
+        <li><b>Recovery technique:</b> move focal vision to the distraction and <em>back</em> within ½-second frames; share attention more than once so the brain perceives the road.</li>
+        <li>Texting is the worst combo: eyes + hands + mind all off the task.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Impairment — even below the legal limit</h2>
+      <ul>
+        <li>BAC under .08 still degrades risk awareness and decision-making — zero-tolerance laws exist for drivers under 21 for a reason.</li>
+        <li>Marijuana and prescription drugs reduce reaction time, lane-keeping, and risk perception.</li>
+        <li>Plan the sober ride <em>before</em> you go out; never ride with an impaired driver.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Fatigue &amp; emotions</h2>
+      <ul>
+        <li><b>Fatigue</b> mimics impairment: slower reactions, microsleeps, fixed stare. Stop, switch drivers, or nap.</li>
+        <li><b>Emotions</b> (anger, grief, anxiety) narrow attention and push risk-taking. Recognize it, cool down, or don't drive yet.</li>
+        <li><b>Road rage prevention:</b> don't take it personally, don't respond, leave room, get away from the aggressive driver.</li>
+      </ul>
+    </div>
+  </template>
+
+  <!-- EMERGENCIES -->
+  <template v-else-if="tab==='emerg'">
+    <div class="card">
+      <h2>Traction loss (skids)</h2>
+      <p>The standards tie skids to <span class="k">understeer</span> (front tires lose grip — car keeps going straight) and <span class="k">oversteer</span> (rear tires lose grip — back end slides out).</p>
+      <ul>
+        <li>Cause: too much speed or braking/acceleration for the traction available.</li>
+        <li>Response: ease off pedals, look where you <em>want</em> to go, steer smoothly toward your target. No sudden inputs.</li>
+        <li>Prevention: slow down before curves; brake <em>before</em> the curve, accelerate gently out.</li>
+        <li>ABS: stomp and steer. Without ABS: squeeze brake and release if wheels lock.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Vehicle malfunctions</h2>
+      <ul>
+        <li><b>Tire blowout:</b> grip firmly, do NOT brake hard; ease off gas, steer straight, then pull off gently.</li>
+        <li><b>Brake failure:</b> pump to build pressure; downshift; use the parking brake gradually.</li>
+        <li><b>Accelerator stuck:</b> shift to neutral, brake, steer off; the engine will rev — that's fine.</li>
+        <li><b>Steering failure / engine stall:</b> both take effort but still work — get off the road with signals and momentum.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Adverse conditions</h2>
+      <ul>
+        <li><b>Rule:</b> your speed must let you steer and stop <em>within the limits of the conditions</em> — not the posted limit.</li>
+        <li><b>Rain/wet:</b> first 10 minutes are slickest (oil rises); add following distance, avoid cruise control, never cross standing water at speed.</li>
+        <li><b>Fog:</b> low beams, slow down, use the right edge line as a guide, never stop in the travel lane.</li>
+        <li><b>Night:</b> speed must fit your headlight vision — slow until you can stop within what you can see.</li>
+        <li><b>Winter:</b> everything takes 3–10× longer; gentle inputs, huge gaps.</li>
+      </ul>
+    </div>
+  </template>
+
+  <!-- CHECKLISTS -->
+  <template v-else-if="tab==='checklists'">
+    <div v-for="(cl, ci) in checklists" :key="ci" class="card">
+      <h2>{{ cl.title }}<span class="badge">{{ doneCount(cl) }}/{{ cl.items.length }}</span></h2>
+      <ul class="checklist">
+        <li v-for="(item, ii) in cl.items" :key="ii" :class="{done: item.done}">
+          <label class="chk">
+            <input type="checkbox" v-model="item.done">
+            <span>{{ item.text }}</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+  </template>
+
+  <!-- QUIZ -->
+  <template v-else-if="tab==='quiz'">
+    <div class="card" v-if="!quizDone">
+      <h2>Question {{ qi + 1 }} of {{ questions.length }}</h2>
+      <div class="q" style="border:none; padding:0; margin:0; background:none">
+        <h3>{{ questions[qi].q }}</h3>
+        <div class="opts">
+          <button v-for="(opt, oi) in questions[qi].opts" :key="oi"
+                  class="opt" :class="optClass(oi)" :disabled="answered"
+                  @click="answer(oi)">
+            <span>{{ String.fromCharCode(65+oi) }}.</span><span>{{ opt }}</span>
+          </button>
+        </div>
+        <div v-if="answered" class="feedback" :class="picked===questions[qi].correct ? 'ok' : 'no'">
+          {{ picked===questions[qi].correct ? '✔ Correct. ' + questions[qi].why : '✘ Not quite. ' + questions[qi].why }}
+        </div>
+      </div>
+      <div style="margin-top:16px; display:flex; gap:10px">
+        <button v-if="answered" class="opt" style="max-width:240px" @click="next">
+          {{ qi+1 < questions.length ? 'Next question →' : 'See results →' }}
+        </button>
+        <button class="opt" style="max-width:180px" @click="resetQuiz">Restart quiz</button>
+      </div>
+    </div>
+    <div class="card" v-else>
+      <h2>Results: {{ score }}/{{ questions.length }}</h2>
+      <p v-if="score===questions.length">Perfect. That's the habit carried into real driving.</p>
+      <p v-else>Review the tabs above — every question maps to a standard.</p>
+      <button class="opt" style="max-width:200px" @click="resetQuiz">Try again</button>
+    </div>
+  </template>
+
+  <footer>
+    Sources: NTDETAS May 2023 Edition (ANSTSE); ADTSEA National Curriculum Standards 2023 (Attachment A); DSAA Curriculum Content Standards (Attachment B); ADTSEA/NRSF &amp; NHTSA resources. Free source PDFs are in the <code>resources/</code> directory of this repository.
+  </footer>
+</div>
+
+<script>
+const { createApp, ref, reactive, computed } = Vue;
+
+createApp({
+  setup() {
+    const tab = ref('home');
+    const tabs = [
+      {id:'home', name:'Start Here'},
+      {id:'see', name:'SEE System'},
+      {id:'space', name:'Space Management'},
+      {id:'fitness', name:'Driver Fitness'},
+      {id:'emerg', name:'Emergencies'},
+      {id:'checklists', name:'Checklists'},
+      {id:'quiz', name:'Quiz'},
+    ];
+
+    const checklists = reactive([
+      { title: 'Every drive, before you start', items: [
+        {text:'Walk-around check: tires, leaks, obstructions behind the vehicle', done:false},
+        {text:'Seat, mirrors, headrest, belt set before the engine starts', done:false},
+        {text:'Phone silenced and out of reach; route set before moving', done:false},
+        {text:'Am I rested, calm, and unimpaired? Honest answer required', done:false},
+      ]},
+      { title: 'While driving — the SEE loop', items: [
+        {text:'Target the farthest point of my intended path', done:false},
+        {text:'Scan 12–15+ seconds ahead; sweep far/near/mirrors/gauges', done:false},
+        {text:'Check rear zone (mirrors) every 5–8 seconds', done:false},
+        {text:'Count following distance: 3s minimum, 4s above ~45 mph', done:false},
+        {text:'Know my escape path at all times — where would I steer right now?', done:false},
+        {text:'Clear intersections left-center-right even on green', done:false},
+      ]},
+      { title: 'Higher-risk situations', items: [
+        {text:'Away from truck no-zones; if I can\'t see their mirrors, they can\'t see me', done:false},
+        {text:'Cover blind spots of parked cars, driveways, and crosswalks', done:false},
+        {text:'Extra space in rain/fog/night — speed within the conditions, not the sign', done:false},
+        {text:'Pass only with a gap I can complete without rushing anyone', done:false},
+      ]},
+    ]);
+
+    const questions = [
+      { q:'You\'re doing 60 mph on a dry highway. What\'s your minimum following distance?',
+        opts:['2 seconds','3 seconds','4 seconds','One car length per 10 mph'],
+        correct:2,
+        why:'Per the DSAA standards: 3 seconds lets you steer out of trouble; 4 seconds lets you brake out of it up to ~65 mph. At 60 mph, braking out is what you need.' },
+      { q:'What does the "E" in the SEE system stand for, and what does it involve?',
+        opts:['Evaluate — judge the speed of other cars only','Execute — adjust speed, position, and communication','Estimate — guess closure rate','Enter — merge into traffic quickly'],
+        correct:1,
+        why:'SEE = Search, Evaluate, Execute. Execute means making speed/position adjustments with appropriate communication — early and small.' },
+      { q:'A driver tailgates you on a two-lane road. The defensive response is:',
+        opts:['Brake-check them to teach a lesson','Speed up until they back off','Increase your own following distance and let them pass when safe','Maintain speed and ignore the space behind you'],
+        correct:2,
+        why:'Your 4-second cushion protects you from being pushed into the car ahead. Opening space ahead lets the tailgater pass safely.' },
+      { q:'Your front tires lose grip in a curve (understeer) and the car plows wide. First move:',
+        opts:['Pull the parking brake','Ease off pedals and steer smoothly where you want to go','Floor the accelerator to pull out of it','Hold the wheel rigid and brake hard immediately'],
+        correct:1,
+        why:'Traction loss means no sudden inputs: come off the gas/brake, look and steer to your intended target.' },
+      { q:'Which of these is the biggest problem with texting while driving?',
+        opts:['It\'s only a fine if you\'re under 18','It combines visual, manual, and mental distraction at once','Phones don\'t distract experienced drivers','Voice-to-text removes the risk entirely'],
+        correct:1,
+        why:'Distraction is a vision-and-mental problem: your focal vision leaves the travel path and your mind leaves the task. Texting removes eyes, hands, and attention simultaneously.' },
+      { q:'Rain starts while you\'re driving. What changes?',
+        opts:['Nothing until the road is visibly soaked','Slow down and add space now — the first minutes are slickest','Turn on cruise control to hold a steady speed','Drive in the tire tracks of the car ahead for grip'],
+        correct:1,
+        why:'Oil and grit rise with the first rain. Your speed must let you steer and stop within the limits of the conditions — before the posted limit matters.' },
+      { q:'A light that has been green for a long time (a "stale green") is best handled by:',
+        opts:['Accelerating to clear it before it changes','Covering the brake and expecting the change','Watching the car behind you','Switching to the fast lane'],
+        correct:1,
+        why:'Predict the worst: a stale green will change, and cross traffic may enter late. Cover the brake, check rear zone, be ready to stop.' },
+      { q:'BAC below the legal limit (.08) but above zero:',
+        opts:['Has no effect on driving','Only matters for commercial drivers','Still degrades risk awareness and decision-making','Is safe if you feel fine'],
+        correct:2,
+        why:'The standards call out impairment effects at BAC below .08–.10: degraded risk awareness and decision-making. Zero-tolerance for under-21 exists for this reason.' },
+      { q:'Where should your visual target be while driving?',
+        opts:['The bumper of the car ahead','The farthest point of your intended travel path','Your phone mount','The lane line next to you'],
+        correct:1,
+        why:'Aim high in steering: targeting the far point of your path keeps the car centered and gives maximum time to see what\'s coming.' },
+      { q:'You\'re approaching a highway merge with slow traffic ahead. The defensive play is:',
+        opts:['Accelerate to the gap regardless of signaling','Match highway speed early, signal, and merge into a real gap','Stop at the top of the ramp and wait','Merge slowly so everyone sees you'],
+        correct:1,
+        why:'Merging is a speed-and-space problem: match flow, communicate, take a genuine gap — never force another driver to brake for you.' },
+    ];
+    const qi = ref(0);
+    const picked = ref(null);
+    const answered = ref(false);
+    const score = ref(0);
+    const quizDone = ref(false);
+
+    function answer(oi) {
+      if (answered.value) return;
+      picked.value = oi;
+      answered.value = true;
+      if (oi === questions[qi.value].correct) score.value++;
+    }
+    function next() {
+      if (qi.value + 1 < questions.length) { qi.value++; }
+      else quizDone.value = true;
+      picked.value = null; answered.value = false;
+    }
+    function resetQuiz() {
+      qi.value = 0; picked.value = null; answered.value = false;
+      score.value = 0; quizDone.value = false;
+    }
+    function optClass(oi) {
+      if (!answered.value) return '';
+      if (oi === questions[qi.value].correct) return 'correct';
+      if (oi === picked.value) return 'wrong';
+      return '';
+    }
+
+    const doneCount = cl => cl.items.filter(i => i.done).length;
+    const totalChecks = computed(() => checklists.reduce((n, c) => n + c.items.length, 0));
+    const doneChecks = computed(() => checklists.reduce((n, c) => n + c.items.filter(i => i.done).length, 0));
+    const overallPct = computed(() => Math.round(doneChecks.value / totalChecks.value * 100));
+
+    return { tab, tabs, checklists, questions, qi, picked, answered, score, quizDone,
+             answer, next, resetQuiz, optClass, doneCount, overallPct };
+  }
+}).mount('#app');
+</script>
 </body>
 </html>
